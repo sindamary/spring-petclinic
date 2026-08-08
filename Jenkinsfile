@@ -32,5 +32,11 @@ pipeline {
             }
         }
 
+        stage('Maven Package') {
+            steps {
+                sh 'mvn package -DskipTests'
+            }
+        }
+
     }
 }
