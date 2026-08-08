@@ -38,5 +38,18 @@ pipeline {
             }
         }
 
+stage('SonarQube Analysis') {
+    steps {
+        withSonarQubeEnv('SonarCloud') {
+            sh '''
+                mvn sonar:sonar \
+                -Dsonar.projectKey=sindamary_spring-petclinic \
+                -Dsonar.organization=sindamary
+            '''
+        }
     }
+}
+
+}
+
 }
