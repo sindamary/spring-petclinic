@@ -1,26 +1,36 @@
-stages {
+pipeline {
+    agent any
 
-    stage('Checkout') {
-        steps {
-            checkout scm
-        }
+    tools {
+        jdk 'JDK21'
+        maven 'Maven'
     }
 
-    stage('Maven Validate') {
-        steps {
-            sh 'mvn validate'
-        }
-    }
+    stages {
 
-    stage('Maven Compile') {
-        steps {
-            sh 'mvn compile'
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
         }
-    }
 
-    stage('Maven Test') {
-        steps {
-            sh 'mvn test'
+        stage('Maven Validate') {
+            steps {
+                sh 'mvn validate'
+            }
         }
+
+        stage('Maven Compile') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+
+        stage('Maven Test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+
     }
 }
