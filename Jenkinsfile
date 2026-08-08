@@ -12,5 +12,11 @@ pipeline {
                 checkout scm
             }
         }
+
+        stage('Maven Validate') {
+            steps {
+                sh 'mvn validate'
+            }
+        }
     }
 }
