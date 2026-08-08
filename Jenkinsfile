@@ -38,30 +38,25 @@ pipeline {
             }
         }
 
-stage('SonarQube Analysis') {
-    steps {
-        withSonarQubeEnv('SonarCloud') {
-            sh '''
-                mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-                -Dsonar.projectKey=sindamary_spring-petclinic \
-                -Dsonar.organization=sindamary
-            '''
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarCloud') {
+                    sh '''
+                        mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+                        -Dsonar.projectKey=sindamary_spring-petclinic \
+                        -Dsonar.organization=sindamary
+                    '''
+                }
+            }
         }
 
-    }
-
-stage('Docker Build') {
-    steps {
-        script {
-            echo 'Building Docker image'
-            sh 'docker build -t spring-petclinic:latest .'
+        stage('Docker Build') {
+            steps {
+                script {
+                    echo 'Building Docker image'
+                    sh 'docker build -t spring-petclinic:latest .'
+                }
+            }
         }
     }
-}
-
-
-}
-
-}
-
 }
