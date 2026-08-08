@@ -47,7 +47,19 @@ stage('SonarQube Analysis') {
                 -Dsonar.organization=sindamary
             '''
         }
+
     }
+
+stage('Docker Build') {
+    steps {
+        script {
+            echo 'Building Docker image'
+            sh 'docker build -t spring-petclinic:latest .'
+        }
+    }
+}
+
+
 }
 
 }
