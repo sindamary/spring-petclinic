@@ -7,6 +7,7 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -18,5 +19,12 @@ pipeline {
                 sh 'mvn validate'
             }
         }
+
+        stage('Maven Compile') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+
     }
 }
