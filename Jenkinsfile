@@ -58,5 +58,18 @@ pipeline {
                 }
             }
         }
+stage('Trivy Image Scan') {
+    steps {
+        echo 'Trivy image scan started'
+        sh '''
+            trivy image \
+            --severity HIGH,CRITICAL \
+            --format table \
+            --output trivy-image-report.txt \
+            spring-petclinic:latest
+        '''
+        echo 'Trivy image scan completed'
+    }
+}
     }
 }
