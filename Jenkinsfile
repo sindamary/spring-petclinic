@@ -5,6 +5,16 @@ pipeline {
         jdk 'JDK21'
         maven 'Maven'
     }
+environment {
+    ACR_NAME = 'sindamaryacr2026'
+    ACR_LOGIN_SERVER = 'sindamaryacr2026.azurecr.io'
+    IMAGE_NAME = 'spring-petclinic'
+    IMAGE_TAG = 'latest'
+    TENANT_ID = '091502bd-d7d4-42f5-82c2-eb0671a586a8'
+    SUBSCRIPTION_ID = '669b4ff7-c7c8-4658-9adb-729a158e4fdb'
+}
+
+
 
     stages {
 
@@ -71,5 +81,47 @@ stage('Trivy Image Scan') {
         echo 'Trivy image scan completed'
     }
 }
+stage('Azure Login') {
+    steps {
+        withCredentials([
+            usernamePassword(
+                credentialsId: 'azure-acr-spn',
+                usernameVariable: 'AZURE_CLIENT_ID',
+                passwordVariable: 'AZURE_CLIENT_SECRET'
+            )
+        ]) {
+            sh '''
+                az login --service-principal \
+                  --username "$AZURE_CLIENT_ID" \
+                  --password "$AZURE_CLIENT_SECRET" \
+                  --tenant "$TENANT_ID"
+
+                az account set --subscription "$SUBSCRIPTION_ID"
+            '''
+        }
+    }
+}
+
+stage('ACR Login') {
+    steps {
+        sh '''
+            az acr login --name "$ACR_NAME"
+        '''
+    }
+}
+
+stage('Docker Push to ACR') {
+    steps {
+        sh '''
+            docker tag \
+              ${IMAGE_NAME}:${IMAGE_TAG} \
+              ${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${IMAGE_TAG}
+
+            docker push \
+              ${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${IMAGE_TAG}
+        '''
+    }
+}
+
     }
 }
