@@ -1,23 +1,20 @@
----
 apiVersion: v1
 kind: Service
 metadata:
   name: petclinic
 spec:
-  type: NodePort
+  type: LoadBalancer
+  selector:
+    app: petclinic
   ports:
     - port: 80
       targetPort: 8080
-  selector:
-    app: petclinic
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: petclinic
-  labels:
-    app: petclinic
 spec:
   replicas: 1
   selector:
@@ -30,35 +27,17 @@ spec:
     spec:
       containers:
         - name: workload
-          image: dsyer/petclinic
+          image: sindamaryacr2026.azurecr.io/spring-petclinic:latest
+          imagePullPolicy: Always
           env:
             - name: SPRING_PROFILES_ACTIVE
-              value: postgres
-            - name: SERVICE_BINDING_ROOT
-              value: /bindings
-            - name: SPRING_APPLICATION_JSON
-              value: |
-                {
-                  "management.endpoint.health.probes.add-additional-paths": true
-                }
+              value: "postgres"
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:postgresql://demo-db:5432/petclinic"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "user"
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "pass"
           ports:
             - name: http
               containerPort: 8080
-          livenessProbe:
-            httpGet:
-              path: /livez
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /readyz
-              port: http
-          volumeMounts:
-            - mountPath: /bindings/secret
-              name: binding
-              readOnly: true
-      volumes:
-        - name: binding
-          projected:
-            sources:
-              - secret:
-                  name: demo-db

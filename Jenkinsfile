@@ -122,6 +122,36 @@ stage('Docker Push to ACR') {
         '''
     }
 }
+stage('Connect to AKS') {
+    steps {
+        sh '''
+            az aks get-credentials \
+              --resource-group rg-project4-jenkins \
+              --name springpetclinicaks \
+              --overwrite-existing
+        '''
+    }
+}
+
+stage('Deploy to Kubernetes') {
+    steps {
+        sh '''
+            kubectl apply -f k8s/db.yml
+            kubectl apply -f k8s/petclinic.yml
+        '''
+    }
+}
+
+stage('Verify Deployment') {
+    steps {
+        sh '''
+            kubectl rollout status deployment/petclinic --timeout=180s
+            kubectl get pods
+            kubectl get svc
+            kubectl get deployments
+        '''
+    }
+}
 
     }
 }
